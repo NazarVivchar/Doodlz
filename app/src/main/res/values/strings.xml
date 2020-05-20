@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Doodlz</string>
+    <string name="Color">Color</string>
+    <string name="Brush">Brush</string>
+    <string name="Clear">Clear</string>
+    <string name="Save">Save</string>
+    <string name="Print">Print</string>
+</resources>
