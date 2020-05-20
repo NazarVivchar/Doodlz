@@ -101,8 +101,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 break;
 
             case R.id.clearId:
-                Log.d("Click", "Clear clicked");
-                drawingView.clear();
+                CleanerDialog dialog = new CleanerDialog();
+                dialog.showDialog(this);
                 break;
 
             case R.id.saveId:
@@ -125,6 +125,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         PrintHelper photoPrinter = new PrintHelper(MainActivity.this);
         photoPrinter.setScaleMode(PrintHelper.SCALE_MODE_FIT);
         photoPrinter.printBitmap("layout", bmp);
+    }
+
+    public void clearDrawing() {
+        drawingView.clear();
     }
 
     @Override
