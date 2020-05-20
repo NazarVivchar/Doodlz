@@ -1,6 +1,10 @@
 package com.teamproject.doodlz.drawing;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -13,6 +17,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.constraintlayout.solver.widgets.ConstraintWidgetContainer;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 
 public class DrawingView extends View {
@@ -165,7 +176,6 @@ public class DrawingView extends View {
     }
 
     public void saveImage() {
-
         final String name = "Doodlz" + System.currentTimeMillis() + ".jpg";
         String description = "Doodlz Drawing";
 
@@ -179,5 +189,4 @@ public class DrawingView extends View {
             Toast.makeText(getContext(), "Error while saving!", Toast.LENGTH_LONG).show();
         }
     }
-
 }
