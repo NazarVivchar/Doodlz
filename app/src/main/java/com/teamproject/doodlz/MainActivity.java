@@ -2,8 +2,11 @@ package com.teamproject.doodlz;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.print.PrintHelper;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -107,11 +110,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 break;
 
             case R.id.printId:
-                Log.d("Click", "Print clicked");
+                onPrint();
                 break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onPrint(){
+        Bitmap bmp = Bitmap.createBitmap(drawingView.getWidth(), drawingView.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bmp);
+        drawingView.draw(canvas);
+        PrintHelper photoPrinter = new PrintHelper(MainActivity.this);
+        photoPrinter.setScaleMode(PrintHelper.SCALE_MODE_FIT);
+        photoPrinter.printBitmap("layout", bmp);
     }
 
     @Override
