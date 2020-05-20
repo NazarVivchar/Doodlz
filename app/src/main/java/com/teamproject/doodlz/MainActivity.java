@@ -110,7 +110,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 break;
 
             case R.id.printId:
-                Log.d("Click", "Print clicked");
                 onPrint();
                 break;
         }
