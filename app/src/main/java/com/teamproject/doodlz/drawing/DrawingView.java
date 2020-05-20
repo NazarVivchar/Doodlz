@@ -7,9 +7,11 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.HashMap;
 
@@ -160,6 +162,22 @@ public class DrawingView extends View {
 
     public float getLineWidth(int width) {
         return brush.getStrokeWidth();
+    }
+
+    public void saveImage() {
+
+        final String name = "Doodlz" + System.currentTimeMillis() + ".jpg";
+        String description = "Doodlz Drawing";
+
+        String location = MediaStore.Images.Media.insertImage(getContext().getContentResolver(),
+                bitmap, name, description);
+
+        if (location != null) {
+            Toast.makeText(getContext(), "Image saved!", Toast.LENGTH_LONG).show();
+        }
+        else {
+            Toast.makeText(getContext(), "Error while saving!", Toast.LENGTH_LONG).show();
+        }
     }
 
 }
