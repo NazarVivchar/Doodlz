@@ -107,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             case R.id.saveId:
                 Log.d("Click", "Save clicked");
+                drawingView.saveImage();
                 break;
 
             case R.id.printId:
