@@ -180,4 +180,8 @@ public class DrawingView extends View {
         }
     }
 
+    public void loadImage(Bitmap bitmap) {
+        this.bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+        bitmapCanvas = new Canvas(this.bitmap);
+    }
 }

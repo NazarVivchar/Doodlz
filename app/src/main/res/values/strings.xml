@@ -5,4 +5,5 @@
     <string name="Clear">Clear</string>
     <string name="Save">Save</string>
     <string name="Print">Print</string>
+    <string name="Load">Load</string>
 </resources>
