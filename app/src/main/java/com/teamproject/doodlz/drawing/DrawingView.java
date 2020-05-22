@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
@@ -179,8 +180,15 @@ public class DrawingView extends View {
         }
     }
 
-    public void loadImage(Bitmap bitmap) {
-        this.bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+    public void loadBitmap(Bitmap bitmap, int appliedRotation) {
+        this.bitmap = transformBitmap(bitmap, appliedRotation).copy(Bitmap.Config.ARGB_8888, true);
         bitmapCanvas = new Canvas(this.bitmap);
+    }
+
+    private Bitmap transformBitmap(Bitmap bitmap, int appliedRotation) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(appliedRotation);
+
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 }

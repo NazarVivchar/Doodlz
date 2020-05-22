@@ -3,12 +3,14 @@ package com.teamproject.doodlz;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -203,13 +205,28 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             case 1:
                 if (resultCode == RESULT_OK && imageReturnedIntent != null) {
                     try {
-                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageReturnedIntent.getData());
-                        drawingView.loadImage(bitmap);
+                        Uri uri = imageReturnedIntent.getData();
+                        int rotation = getOrientation(this, uri);
+
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+                        drawingView.loadBitmap(bitmap, rotation);
                     } catch (Exception exception) {
                         System.out.println(exception);
                     }
                 }
                 break;
         }
+    }
+
+    private static int getOrientation(Context context, Uri photoUri) {
+        Cursor cursor = context.getContentResolver().query(photoUri,
+                new String[] { MediaStore.Images.ImageColumns.ORIENTATION }, null, null, null);
+
+        if (cursor.getCount() != 1) {
+            return -1;
+        }
+
+        cursor.moveToFirst();
+        return cursor.getInt(0);
     }
 }
