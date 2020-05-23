@@ -1,8 +1,10 @@
 package com.teamproject.doodlz;
 
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -39,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private float mAccelLast;
     private SensorEventListener mSensorListener;
     private AlertDialog.Builder currentAlerDialog;
+    private AlertDialog dialogLineWidth;
+    private ImageView widthImageView;
     private AlertDialog colorDialog;
     private SeekBar alphaSeekBar;
     private SeekBar redSeekBar;
@@ -117,6 +121,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             case R.id.brushId:
                 Log.d("Click", "Brush clicked");
+                showLineWidthDialog();
                 break;
 
             case R.id.clearId:
@@ -149,6 +154,60 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         return super.onOptionsItemSelected(item);
     }
+
+    private void showLineWidthDialog() {
+        currentAlerDialog = new AlertDialog.Builder(this);
+        View view = getLayoutInflater().inflate(R.layout.line_width, null);
+        final SeekBar widthSeekBar = view.findViewById(R.id.widthSeekBar);
+        Button setLineWidthButton = view.findViewById(R.id.widthDialogButton);
+        widthImageView = view.findViewById(R.id.imageViewId);
+        setLineWidthButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view)
+            {
+                drawingView.setLineWidth(widthSeekBar.getProgress());
+                dialogLineWidth.dismiss();
+                currentAlerDialog = null;
+            }
+        });
+
+
+        widthSeekBar.setOnSeekBarChangeListener(widthSeekBarChange);
+
+        currentAlerDialog.setView(view);
+        dialogLineWidth = currentAlerDialog.create();
+        dialogLineWidth.setTitle("Chose Line Width");
+        dialogLineWidth.show();
+    }
+
+    private SeekBar.OnSeekBarChangeListener widthSeekBarChange = new SeekBar.OnSeekBarChangeListener()
+    {
+        Bitmap bitmap = Bitmap.createBitmap(400, 100,Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+        {
+
+            Paint p = new Paint();
+            p.setColor(drawingView.getDrawingColor());
+            p.setStrokeCap(Paint.Cap.ROUND);
+            p.setStrokeWidth(progress);
+
+            bitmap.eraseColor(Color.WHITE);
+            canvas.drawLine(30, 50,370, 50, p);
+            widthImageView.setImageBitmap(bitmap);
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    };
 
     private boolean checkPermission() {
         int result = ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -264,6 +323,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     blueSeekBar.getProgress()
             ));
         }
+
 
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
