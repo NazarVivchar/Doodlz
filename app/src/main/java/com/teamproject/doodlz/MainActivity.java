@@ -1,6 +1,11 @@
 package com.teamproject.doodlz;
 
+import android.graphics.Color;
+import android.view.View;
+import android.widget.Button;
+import android.widget.SeekBar;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -33,6 +38,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private float mAccelCurrent;
     private float mAccelLast;
     private SensorEventListener mSensorListener;
+    private AlertDialog.Builder currentAlerDialog;
+    private AlertDialog colorDialog;
+    private SeekBar alphaSeekBar;
+    private SeekBar redSeekBar;
+    private SeekBar greenSeekBar;
+    private SeekBar blueSeekBar;
+    private View colorView;
 
     private DrawingView drawingView;
 
@@ -99,7 +111,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         switch (item.getItemId()) {
 
             case R.id.colorId:
-                Log.d("Click", "Color clicked");
+                showColorDialog();
+                //Log.d("Click", "Color clicked");
                 break;
 
             case R.id.brushId:
@@ -188,4 +201,78 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) { }
+
+    void showColorDialog() {
+        currentAlerDialog = new AlertDialog.Builder(this);
+        View view = getLayoutInflater().inflate(R.layout.color_dialog, null);
+        alphaSeekBar = view.findViewById(R.id.alphaSeekBar);
+        redSeekBar = view.findViewById(R.id.redSeekBar);
+        greenSeekBar = view.findViewById(R.id.greenSeekBar);
+        blueSeekBar = view.findViewById(R.id.blueSeekBar);
+        colorView = view.findViewById(R.id.colorView);
+
+        //register SeekBar event Listeners
+        alphaSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
+        redSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
+        greenSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
+        blueSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
+
+        int color = drawingView.getDrawingColor();
+        alphaSeekBar.setProgress(Color.alpha(color));
+        redSeekBar.setProgress(Color.red(color));
+        greenSeekBar.setProgress(Color.green(color));
+        blueSeekBar.setProgress(Color.blue(color));
+
+        Button setColorButton = view.findViewById(R.id.setColorButton);
+        setColorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawingView.setDrawingColor(Color.argb(
+                        alphaSeekBar.getProgress(),
+                        redSeekBar.getProgress(),
+                        greenSeekBar.getProgress(),
+                        blueSeekBar.getProgress()
+                ));
+
+                colorDialog.dismiss();
+            }
+        });
+
+        currentAlerDialog.setView(view);
+        currentAlerDialog.setTitle("Choose Colour");
+        colorDialog = currentAlerDialog.create();
+        colorDialog.show();
+
+
+    }
+
+    private SeekBar.OnSeekBarChangeListener colorSeekBarChanged = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            drawingView.setBackgroundColor(Color.argb(
+                    alphaSeekBar.getProgress(),
+                    redSeekBar.getProgress(),
+                    greenSeekBar.getProgress(),
+                    blueSeekBar.getProgress()
+            ));
+
+            //display the current color
+            colorView.setBackgroundColor(Color.argb(
+                    alphaSeekBar.getProgress(),
+                    redSeekBar.getProgress(),
+                    greenSeekBar.getProgress(),
+                    blueSeekBar.getProgress()
+            ));
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    };
 }
