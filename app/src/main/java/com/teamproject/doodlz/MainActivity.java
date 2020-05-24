@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -18,9 +20,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -37,6 +44,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private float mAccelCurrent;
     private float mAccelLast;
     private SensorEventListener mSensorListener;
+    private AlertDialog.Builder currentAlerDialog;
+    private AlertDialog dialogLineWidth;
+    private ImageView widthImageView;
+    private AlertDialog colorDialog;
+    private SeekBar alphaSeekBar;
+    private SeekBar redSeekBar;
+    private SeekBar greenSeekBar;
+    private SeekBar blueSeekBar;
+    private View colorView;
 
     private DrawingView drawingView;
 
@@ -103,16 +119,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         switch (item.getItemId()) {
 
             case R.id.colorId:
-                Log.d("Click", "Color clicked");
+                showColorDialog();
+                //Log.d("Click", "Color clicked");
                 break;
 
             case R.id.brushId:
                 Log.d("Click", "Brush clicked");
+                showLineWidthDialog();
                 break;
 
             case R.id.clearId:
-                Log.d("Click", "Clear clicked");
-                drawingView.clear();
+                CleanerDialog dialog = new CleanerDialog();
+                dialog.showDialog(this);
                 break;
 
             case R.id.loadId:
@@ -144,6 +162,60 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         return super.onOptionsItemSelected(item);
     }
+
+    private void showLineWidthDialog() {
+        currentAlerDialog = new AlertDialog.Builder(this);
+        View view = getLayoutInflater().inflate(R.layout.line_width, null);
+        final SeekBar widthSeekBar = view.findViewById(R.id.widthSeekBar);
+        Button setLineWidthButton = view.findViewById(R.id.widthDialogButton);
+        widthImageView = view.findViewById(R.id.imageViewId);
+        setLineWidthButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view)
+            {
+                drawingView.setLineWidth(widthSeekBar.getProgress());
+                dialogLineWidth.dismiss();
+                currentAlerDialog = null;
+            }
+        });
+
+
+        widthSeekBar.setOnSeekBarChangeListener(widthSeekBarChange);
+
+        currentAlerDialog.setView(view);
+        dialogLineWidth = currentAlerDialog.create();
+        dialogLineWidth.setTitle("Chose Line Width");
+        dialogLineWidth.show();
+    }
+
+    private SeekBar.OnSeekBarChangeListener widthSeekBarChange = new SeekBar.OnSeekBarChangeListener()
+    {
+        Bitmap bitmap = Bitmap.createBitmap(400, 100,Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+        {
+
+            Paint p = new Paint();
+            p.setColor(drawingView.getDrawingColor());
+            p.setStrokeCap(Paint.Cap.ROUND);
+            p.setStrokeWidth(progress);
+
+            bitmap.eraseColor(Color.WHITE);
+            canvas.drawLine(30, 50,370, 50, p);
+            widthImageView.setImageBitmap(bitmap);
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    };
 
     private boolean checkPermission() {
         int result = ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -183,6 +255,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         PrintHelper photoPrinter = new PrintHelper(MainActivity.this);
         photoPrinter.setScaleMode(PrintHelper.SCALE_MODE_FIT);
         photoPrinter.printBitmap("layout", bmp);
+    }
+
+    public void clearDrawing() {
+        drawingView.clear();
     }
 
     @Override
@@ -229,4 +305,79 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         cursor.moveToFirst();
         return cursor.getInt(0);
     }
+
+    void showColorDialog() {
+        currentAlerDialog = new AlertDialog.Builder(this);
+        View view = getLayoutInflater().inflate(R.layout.color_dialog, null);
+        alphaSeekBar = view.findViewById(R.id.alphaSeekBar);
+        redSeekBar = view.findViewById(R.id.redSeekBar);
+        greenSeekBar = view.findViewById(R.id.greenSeekBar);
+        blueSeekBar = view.findViewById(R.id.blueSeekBar);
+        colorView = view.findViewById(R.id.colorView);
+
+        //register SeekBar event Listeners
+        alphaSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
+        redSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
+        greenSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
+        blueSeekBar.setOnSeekBarChangeListener(colorSeekBarChanged);
+
+        int color = drawingView.getDrawingColor();
+        alphaSeekBar.setProgress(Color.alpha(color));
+        redSeekBar.setProgress(Color.red(color));
+        greenSeekBar.setProgress(Color.green(color));
+        blueSeekBar.setProgress(Color.blue(color));
+
+        Button setColorButton = view.findViewById(R.id.setColorButton);
+        setColorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawingView.setDrawingColor(Color.argb(
+                        alphaSeekBar.getProgress(),
+                        redSeekBar.getProgress(),
+                        greenSeekBar.getProgress(),
+                        blueSeekBar.getProgress()
+                ));
+
+                colorDialog.dismiss();
+            }
+        });
+
+        currentAlerDialog.setView(view);
+        currentAlerDialog.setTitle("Choose Colour");
+        colorDialog = currentAlerDialog.create();
+        colorDialog.show();
+
+
+    }
+
+    private SeekBar.OnSeekBarChangeListener colorSeekBarChanged = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            drawingView.setBackgroundColor(Color.argb(
+                    alphaSeekBar.getProgress(),
+                    redSeekBar.getProgress(),
+                    greenSeekBar.getProgress(),
+                    blueSeekBar.getProgress()
+            ));
+
+            //display the current color
+            colorView.setBackgroundColor(Color.argb(
+                    alphaSeekBar.getProgress(),
+                    redSeekBar.getProgress(),
+                    greenSeekBar.getProgress(),
+                    blueSeekBar.getProgress()
+            ));
+        }
+
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    };
 }

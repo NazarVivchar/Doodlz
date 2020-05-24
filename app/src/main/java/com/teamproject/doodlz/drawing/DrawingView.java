@@ -152,7 +152,7 @@ public class DrawingView extends View {
         brush.setColor(color);
     }
 
-    public int getDrawingColor(int color) {
+    public int getDrawingColor() {
         return brush.getColor();
     }
 
