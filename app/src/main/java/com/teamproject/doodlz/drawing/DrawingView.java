@@ -1,13 +1,10 @@
 package com.teamproject.doodlz.drawing;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
-import android.content.ContextWrapper;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
@@ -17,13 +14,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.constraintlayout.solver.widgets.ConstraintWidgetContainer;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.HashMap;
 
 public class DrawingView extends View {
@@ -188,5 +178,17 @@ public class DrawingView extends View {
         else {
             Toast.makeText(getContext(), "Error while saving!", Toast.LENGTH_LONG).show();
         }
+    }
+
+    public void loadBitmap(Bitmap bitmap, int appliedRotation) {
+        this.bitmap = transformBitmap(bitmap, appliedRotation).copy(Bitmap.Config.ARGB_8888, true);
+        bitmapCanvas = new Canvas(this.bitmap);
+    }
+
+    private Bitmap transformBitmap(Bitmap bitmap, int appliedRotation) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(appliedRotation);
+
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 }

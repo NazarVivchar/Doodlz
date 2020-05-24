@@ -18,6 +18,11 @@
         android:title="@string/Clear"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/loadId"
+        android:icon="@drawable/twotone_folder_open_white_18dp"
+        android:title="@string/Load"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/saveId"
         android:icon="@drawable/twotone_save_white_18dp"
         android:title="@string/Save"

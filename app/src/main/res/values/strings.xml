@@ -5,6 +5,7 @@
     <string name="Clear">Clear</string>
     <string name="Save">Save</string>
     <string name="Print">Print</string>
+    <string name="Load">Load</string>
     <string name="label_red">Red</string>
     <string name="label_alpha">Alpha</string>
     <string name="label_green">Green</string>
